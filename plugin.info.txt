@@ -1,0 +1,7 @@
+base   menuext
+author Andreas Gohr
+email  andi@splitbrain.org
+date   2021-07-13
+name   menuext plugin
+desc   Extend any of the standard menus with custom links
+url    https://www.dokuwiki.org/plugin/menuext
