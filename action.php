@@ -60,28 +60,6 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
      */
     public function handle_menu_items_assembly(Doku_Event $event, $param)
     {
-
-        $config = [
-            'page' => [
-                [
-                    'order' => 3,
-                    'label' => [
-                        'en' => 'Google Search',
-                        'de' => 'Google Suche'
-                    ],
-                    'title' => [
-                        'en' => 'Execute a Google search on the current page ID',
-                        'de' => 'Führe eine Google Suche mit der aktuellen Seiten-ID aus'
-                    ],
-                    'link' => 'https://www.google.com/search?q=@ID@',
-                    'svg' => 'google.svg',
-                    'attr' => [
-                        'target' => '_blank'
-                    ]
-                ]
-            ]
-        ];
-
         $view = $event->data['view'];
         if(!isset($this->menuconf[$view])) return;
 
