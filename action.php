@@ -64,7 +64,7 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
         if(!isset($this->menuconf[$view])) return;
 
         foreach ($this->menuconf[$view] as $data) {
-            $order = isset($data['order']) ? $data['order'] : -2;
+            $order = isset($data['order']) ? $data['order'] : count($event->data['items']);
             $item = new MenuExtItem($data);
             array_splice($event->data['items'], $order, 0, [$item]);
         }
