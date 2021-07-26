@@ -23,9 +23,9 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
     public function __construct()
     {
         $cf = DOKU_CONF . 'menuext.json';
-        if(file_exists($cf)) {
+        if (file_exists($cf)) {
             $config = @json_decode(file_get_contents($cf), true);
-            if(!is_array($config)) {
+            if (!is_array($config)) {
                 msg('Failed to parse config for MenuExt plugin in conf/menuext.json', -1, '', '', MSG_ADMINS_ONLY);
             }
         } else {
@@ -52,8 +52,8 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
      *
      * Called for event:
      *
-     * @param Doku_Event $event  event object by reference
-     * @param mixed      $param  [the parameters passed as fifth argument to register_hook() when this
+     * @param Doku_Event $event event object by reference
+     * @param mixed $param [the parameters passed as fifth argument to register_hook() when this
      *                           handler was registered]
      *
      * @return void
@@ -61,11 +61,25 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
     public function handle_menu_items_assembly(Doku_Event $event, $param)
     {
         $view = $event->data['view'];
-        if(!isset($this->menuconf[$view])) return;
+        if (!isset($this->menuconf[$view])) return;
 
         foreach ($this->menuconf[$view] as $data) {
-            $order = isset($data['order']) ? $data['order'] : count($event->data['items']);
-            $item = new MenuExtItem($data);
+            $order = isset($data['order']) ? (int) $data['order'] : count($event->data['items']);
+
+            // default action or custom one?
+            if (isset($data['action'])) {
+                $action = ucfirst(strtolower($data['action']));
+
+                $class = "\\dokuwiki\\Menu\\Item\\$action";
+                if (!class_exists($class)) {
+                    msg('No menu item for action ' . hsc($action), -1, '', '', MSG_ADMINS_ONLY);
+                    continue;
+                }
+                $item = new $class();
+            } else {
+                $item = new MenuExtItem($data);
+            }
+
             array_splice($event->data['items'], $order, 0, [$item]);
         }
     }

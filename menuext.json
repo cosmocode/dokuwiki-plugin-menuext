@@ -15,6 +15,9 @@
             "attr": {
                 "target": "_blank"
             }
+        },
+        {
+            "action": "login"
         }
     ]
 }
