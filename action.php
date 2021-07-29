@@ -76,6 +76,18 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
                     continue;
                 }
                 $item = new $class();
+            } else if (isset($data['classname'])) {
+                $class = $data['classname'];
+                if (!class_exists($class)) {
+                    msg('Item class ' . hsc($class) . ' does not exist', -1, '', '', MSG_ADMINS_ONLY);
+                    continue;
+                }
+                $item = new $class();
+                if (!is_a($item, 'dokuwiki\Menu\Item\AbstractItem')) {
+                    msg('Not a menu item: ' . hsc($class), -1, '', '', MSG_ADMINS_ONLY);
+                    unset($item);
+                    continue;
+                }
             } else {
                 $item = new MenuExtItem($data);
             }
