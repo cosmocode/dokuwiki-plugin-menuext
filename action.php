@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DokuWiki Plugin menuext (Action Component)
  *
@@ -6,14 +7,12 @@
  * @author  Andreas Gohr <andi@splitbrain.org>
  */
 
-// must be run within Dokuwiki
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
 use dokuwiki\plugin\menuext\MenuExtItem;
 
-if (!defined('DOKU_INC')) {
-    die();
-}
-
-class action_plugin_menuext extends DokuWiki_Action_Plugin
+class action_plugin_menuext extends ActionPlugin
 {
     protected $menuconf = [];
 
@@ -37,14 +36,13 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
     /**
      * Registers a callback function for a given event
      *
-     * @param Doku_Event_Handler $controller DokuWiki's event controller object
+     * @param EventHandler $controller DokuWiki's event controller object
      *
      * @return void
      */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('MENU_ITEMS_ASSEMBLY', 'AFTER', $this, 'handle_menu_items_assembly', [], 999);
-
     }
 
     /**
@@ -52,13 +50,13 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
      *
      * Called for event:
      *
-     * @param Doku_Event $event event object by reference
+     * @param Event $event event object by reference
      * @param mixed $param [the parameters passed as fifth argument to register_hook() when this
      *                           handler was registered]
      *
      * @return void
      */
-    public function handle_menu_items_assembly(Doku_Event $event, $param)
+    public function handle_menu_items_assembly(Event $event, $param)
     {
         $view = $event->data['view'];
         if (!isset($this->menuconf[$view])) return;
@@ -68,15 +66,18 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
 
             // default action or custom one?
             if (isset($data['action'])) {
-                $action = ucfirst(strtolower($data['action']));
-
-                $class = "\\dokuwiki\\Menu\\Item\\$action";
-                if (!class_exists($class)) {
-                    msg('No menu item for action ' . hsc($action), -1, '', '', MSG_ADMINS_ONLY);
-                    continue;
+                try {
+                    $action = ucfirst(strtolower($data['action']));
+                    $class = "\\dokuwiki\\Menu\\Item\\$action";
+                    if (!class_exists($class)) {
+                        msg('No menu item for action ' . hsc($action), -1, '', '', MSG_ADMINS_ONLY);
+                        continue;
+                    }
+                    $item = new $class();
+                } catch (\RuntimeException $e) {
+                    // just ignore action exceptions, probably caused by insufficient permissions
                 }
-                $item = new $class();
-            } else if (isset($data['classname'])) {
+            } elseif (isset($data['classname'])) {
                 $class = $data['classname'];
                 if (!class_exists($class)) {
                     msg('Item class ' . hsc($class) . ' does not exist', -1, '', '', MSG_ADMINS_ONLY);
@@ -96,4 +97,3 @@ class action_plugin_menuext extends DokuWiki_Action_Plugin
         }
     }
 }
-

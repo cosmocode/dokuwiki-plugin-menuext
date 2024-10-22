@@ -2,15 +2,15 @@
 
 namespace dokuwiki\plugin\menuext;
 
+use dokuwiki\Menu\Item\AbstractItem;
 use dokuwiki\Input\Input;
 use dokuwiki\Utf8\PhpString;
 
 /**
  * Custom Menu Item
  */
-class MenuExtItem extends \dokuwiki\Menu\Item\AbstractItem
+class MenuExtItem extends AbstractItem
 {
-
     protected $link;
     protected $attributes;
 
@@ -64,7 +64,7 @@ class MenuExtItem extends \dokuwiki\Menu\Item\AbstractItem
     public function getLinkAttributes($classprefix = 'menuitem ')
     {
         $attr = parent::getLinkAttributes($classprefix);
-        if(is_array($this->attributes)) {
+        if (is_array($this->attributes)) {
             $attr = array_merge($attr, $this->attributes);
         }
         return $attr;
@@ -129,10 +129,10 @@ class MenuExtItem extends \dokuwiki\Menu\Item\AbstractItem
                 $USERINFO ? $USERINFO['name'] : '',
                 $USERINFO ? $USERINFO['mail'] : '',
                 $conf['dformat'],
-            ]), $link
+            ]),
+            $link
         );
 
         return $link;
     }
-
 }
