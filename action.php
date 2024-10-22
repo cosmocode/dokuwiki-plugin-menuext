@@ -66,15 +66,18 @@ class action_plugin_menuext extends ActionPlugin
 
             // default action or custom one?
             if (isset($data['action'])) {
-                $action = ucfirst(strtolower($data['action']));
-
-                $class = "\\dokuwiki\\Menu\\Item\\$action";
-                if (!class_exists($class)) {
-                    msg('No menu item for action ' . hsc($action), -1, '', '', MSG_ADMINS_ONLY);
-                    continue;
+                try {
+                    $action = ucfirst(strtolower($data['action']));
+                    $class = "\\dokuwiki\\Menu\\Item\\$action";
+                    if (!class_exists($class)) {
+                        msg('No menu item for action ' . hsc($action), -1, '', '', MSG_ADMINS_ONLY);
+                        continue;
+                    }
+                    $item = new $class();
+                } catch (\RuntimeException $e) {
+                    // just ignore action exceptions, probably caused by insufficient permissions
                 }
-                $item = new $class();
-            } else if (isset($data['classname'])) {
+            } elseif (isset($data['classname'])) {
                 $class = $data['classname'];
                 if (!class_exists($class)) {
                     msg('Item class ' . hsc($class) . ' does not exist', -1, '', '', MSG_ADMINS_ONLY);
