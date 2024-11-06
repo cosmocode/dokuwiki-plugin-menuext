@@ -76,6 +76,7 @@ class action_plugin_menuext extends ActionPlugin
                     $item = new $class();
                 } catch (\RuntimeException $e) {
                     // just ignore action exceptions, probably caused by insufficient permissions
+                    continue;
                 }
             } elseif (isset($data['classname'])) {
                 $class = $data['classname'];
